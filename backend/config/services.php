@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'petstore' => [
+        'base_url' => env('PETSTORE_API_URL', 'https://petstore.swagger.io/v2/pet'),
+        'api_key' => env('PETSTORE_API_KEY', 'default_api_key'),
+    ]
+
 ];
