@@ -2,10 +2,9 @@
 
 namespace App\Modules\Pet\Repositories;
 
-use App\Modules\Pet\Exceptions\ApiRequestException;
 use App\Modules\Pet\Interfaces\PetRepositoryInterface;
+use App\Modules\Pet\Requests\UploadImageRequest;
 use App\Modules\Pet\Services\ApiResponseHandler;
-use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 
 class PetRepository implements PetRepositoryInterface
@@ -28,7 +27,7 @@ class PetRepository implements PetRepositoryInterface
 
     public function getById(int $id)
     {
-        $response = Http::get($this->baseUrl . '/' . $id);
+        $response = Http::get("{$this->baseUrl}/{$id}");
 
         return $this->responseHandler->handle($response, __FUNCTION__);
     }
@@ -40,7 +39,7 @@ class PetRepository implements PetRepositoryInterface
         return $this->responseHandler->handle($response, __FUNCTION__);
     }
 
-    public function uploadImage($id, $request)
+    public function uploadImage($id, UploadImageRequest $request)
     {
         $response = Http::attach(
             'file', $request->file('file')->get(), $request->file('file')->getClientOriginalName()

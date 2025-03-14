@@ -4,6 +4,7 @@ namespace App\Modules\Pet\Services;
 
 use App\Modules\Pet\Interfaces\PetRepositoryInterface;
 use App\Modules\Pet\Interfaces\PetServiceInterface;
+use App\Modules\Pet\Requests\UploadImageRequest;
 
 class PetService implements PetServiceInterface
 {
@@ -13,7 +14,6 @@ class PetService implements PetServiceInterface
     {
         $this->repository = $repository;
     }
-
 
     public function addPet(array $data)
     {
@@ -30,7 +30,7 @@ class PetService implements PetServiceInterface
         return $this->repository->getByStatus($status);
     }
 
-    public function uploadPetImage($id, $request)
+    public function uploadPetImage($id, UploadImageRequest $request)
     {
         return $this->repository->uploadImage($id, $request);
     }
