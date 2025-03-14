@@ -24,7 +24,7 @@
             <!-- Id -->
             <div class="form-group">
                 <label for="id">Id</label>
-                <input name="id" id="id" class="form-control" value="{{ $pet['id'] ?? '' }}" required>
+                <input type="number" name="id" id="id" class="form-control" value="{{ $pet['id'] ?? '' }}" required>
             </div>
 
             <!-- Kategoria -->
@@ -63,7 +63,7 @@
             <div class="form-group mt-3" id="tags-container">
                 <label>Tagi</label>
                 <div class="tag-input">
-                    <input type="text" name="tags[0][id]" placeholder="ID tagu" class="form-control" value="{{ old('tags.0.id') }}">
+                    <input type="number" name="tags[0][id]" placeholder="ID tagu" class="form-control" value="{{ old('tags.0.id') }}">
                     <input type="text" name="tags[0][name]" placeholder="Nazwa tagu" class="form-control mt-1" value="{{ old('tags.0.name') }}">
                 </div>
             </div>

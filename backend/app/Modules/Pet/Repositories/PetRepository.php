@@ -44,7 +44,7 @@ class PetRepository implements PetRepositoryInterface
     {
         $response = Http::attach(
             'file', $request->file('file')->get(), $request->file('file')->getClientOriginalName()
-        )->post("{$this->baseUrl}/{$id}/uploadImage", [
+        )->asMultipart()->post("{$this->baseUrl}/{$id}/uploadImage", [
             'additionalMetadata' => $request->input('additionalMetadata'),
         ]);
 
@@ -53,7 +53,7 @@ class PetRepository implements PetRepositoryInterface
 
     public function partialUpdate(int $id, array $data)
     {
-        $response = Http::post("{$this->baseUrl}/{$id}", $data);
+        $response = Http::asForm()->post("{$this->baseUrl}/{$id}", $data);
 
         return $this->responseHandler->handle($response, __FUNCTION__);
     }
@@ -67,9 +67,8 @@ class PetRepository implements PetRepositoryInterface
 
     public function delete(int $id)
     {
-        $response = Http::delete("{$this->baseUrl}/{$id}")
-            ->withHeader('api_key', config('services.petstore.api_key'));
-
+        $response = Http::withHeader('api_key', config('services.petstore.api_key'))
+            ->delete("{$this->baseUrl}/{$id}");
         return $this->responseHandler->handle($response, __FUNCTION__);
     }
 }

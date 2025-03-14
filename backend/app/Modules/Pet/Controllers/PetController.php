@@ -6,7 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Modules\Pet\Enums\PetStatus;
 use App\Modules\Pet\Interfaces\PetServiceInterface;
 use App\Modules\Pet\Requests\CreateOrUpdateRequest;
-use Illuminate\Http\JsonResponse;
+use App\Modules\Pet\Requests\PartialUpdateRequest;
+use App\Modules\Pet\Requests\UploadImageRequest;
 use Illuminate\Http\Request;
 
 class PetController extends Controller
@@ -58,8 +59,7 @@ class PetController extends Controller
         try {
             $pet = $this->petService->getPetById($id);
             return view('pets.show', compact('pet'));
-        }
-        catch (\Exception $e) {
+        } catch (\Exception $e) {
             return view('pets.error', [
                 'errorCode' => $e->getCode(),
                 'errorMessage' => $e->getMessage()
@@ -69,31 +69,87 @@ class PetController extends Controller
 
     public function edit(int $id)
     {
-        $pet = $this->petService->getPetById($id);
-        $categories = config('petstore.categories');
-
-        return view('pets.edit', compact('pet', 'categories'));
+        try {
+            $pet = $this->petService->getPetById($id);
+            $categories = config('petstore.categories');
+            return view('pets.edit', compact('pet', 'categories'));
+        } catch (\Exception $e) {
+            return view('pets.error', [
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage()
+            ]);
+        }
     }
 
-    public function update(Request $request): JsonResponse
+    public function update(CreateOrUpdateRequest $request)
     {
         $data = $request->all();
+        try {
+            response()->json($this->petService->updatePet($data));
+            session()->flash('success', 'Edycja zwierzaka powiodła się');
+            return redirect()->route('pets.index');
+        } catch (\Exception $e) {
+            return view('pets.error', [
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage()
+            ]);
+        }
 
-        return response()->json($this->petService->updatePet($data));
     }
 
-    public function partialUpdate(int $id, array $data)
+    public function partialEdit(int $id)
     {
-        return response()->json($this->petService->partialUpdatePet($data));
+        try {
+            $pet = $this->petService->getPetById($id);
+            return view('pets.partial_edit', compact('pet'));
+        } catch (\Exception $e) {
+            return view('pets.error', [
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage()
+            ]);
+        }
     }
 
-    public function uploadImage(int $id, Request $request)
+    public function partialUpdate(int $id, PartialUpdateRequest $request)
     {
-        return response()->json($this->petService->uploadPetImage($id, $request));
+        $data = $request->all();
+        try {
+            $this->petService->partialUpdatePet($id, $data);
+            session()->flash('success', 'Edycja częściowa zwierzaka powiodła się');
+            return redirect()->route('pets.index');
+        } catch (\Exception $e) {
+            return view('pets.error', [
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage()
+            ]);
+        }
     }
 
-    public function destroy(int $id): JsonResponse
+    public function uploadImage(int $id, UploadImageRequest $request)
     {
-        return response()->json($this->petService->deletePet($id));
+        try {
+            $this->petService->uploadPetImage($id, $request);
+            session()->flash('success', 'Dodanie zdjęcia powiodło się');
+            return redirect()->route('pets.index');
+        } catch (\Exception $e) {
+            return view('pets.error', [
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage()
+            ]);
+        }
+    }
+
+    public function destroy(int $id)
+    {
+        try {
+            $this->petService->deletePet($id);
+            session()->flash('success', 'Zwierzak został usunięty');
+            return redirect()->route('pets.index');
+        } catch (\Exception $e) {
+            return view('pets.error', [
+                'errorCode' => $e->getCode(),
+                'errorMessage' => $e->getMessage()
+            ]);
+        }
     }
 }

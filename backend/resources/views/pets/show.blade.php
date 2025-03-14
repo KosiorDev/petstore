@@ -71,6 +71,9 @@
                     <a href="{{ route('pets.edit', $pet['id']) }}" class="btn btn-primary">
                         ✏ Edytuj
                     </a>
+                    <a href="{{ route('pets.edit.partial', $pet['id']) }}" class="btn btn-primary">
+                        ✏ Edytuj część
+                    </a>
                     <form action="{{ route('pets.destroy', $pet['id']) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć?');">
                         @csrf
                         @method('DELETE')

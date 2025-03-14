@@ -31,8 +31,16 @@ class ApiResponseHandler
                 $this->handleUpdatePetError($response);
                 break;
 
+            case 'partialUpdate':
+                $this->handlePartialUpdatePetError($response);
+                break;
+
             case 'uploadImage':
                 $this->handleUploadImageError($response);
+                break;
+
+            case 'delete':
+                $this->handlePetDeleteError($response);
                 break;
 
             default:
@@ -57,7 +65,7 @@ class ApiResponseHandler
                 throw new \Exception('Podane nieprawidłowe ID.', 400);
 
             case 404:
-                throw new \Exception('Nie znaleziono zwierzaka.', 400);
+                throw new \Exception('Nie znaleziono zwierzaka.', 404);
         }
 
         $this->handleGenericError($response);
@@ -65,8 +73,8 @@ class ApiResponseHandler
 
     private function handleCreatePetError(Response $response)
     {
-        if ($response->status() === 400) {
-            throw new HttpResponseException(response()->json(['error' => 'Błąd walidacji.'], 400));
+        if ($response->status() === 405) {
+            throw new \Exception('Wprowadzono nieprawidłowe dane', 405);
         }
 
         $this->handleGenericError($response);
@@ -74,8 +82,24 @@ class ApiResponseHandler
 
     private function handleUpdatePetError(Response $response)
     {
-        if ($response->status() === 404) {
-            throw new HttpResponseException(response()->json(['error' => 'Nie można zaktualizować – zwierzak nie istnieje.'], 404));
+        switch ($response->status()) {
+            case 400:
+                throw new \Exception('Podano nieprawidłowe ID.', 400);
+
+            case 404:
+                throw new \Exception('Nie znaleziono zwierzaka.', 404);
+
+            case 405:
+                throw new \Exception('Błąd walidacji.', 405);
+        }
+
+        $this->handleGenericError($response);
+    }
+
+    private function handlePartialUpdatePetError(Response $response)
+    {
+        if ($response->status() === 405) {
+            throw new HttpResponseException(response()->json(['error' => 'Wprowadzono nieprawidłowe dane'], 405));
         }
 
         $this->handleGenericError($response);
@@ -85,6 +109,19 @@ class ApiResponseHandler
     {
         if ($response->status() === 415) {
             throw new HttpResponseException(response()->json(['error' => 'Nieprawidłowy format pliku.'], 415));
+        }
+
+        $this->handleGenericError($response);
+    }
+
+    private function handlePetDeleteError(Response $response)
+    {
+        switch ($response->status()) {
+            case 400:
+                throw new \Exception('Podano nieprawidłowe ID.', 400);
+
+            case 404:
+                throw new \Exception('Nie znaleziono zwierzaka.', 404);
         }
 
         $this->handleGenericError($response);
